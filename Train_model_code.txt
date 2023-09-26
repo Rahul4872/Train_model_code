@@ -1,0 +1,35 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = sns.load_dataset("titanic")
+X = df[['pclass', 'sex', 'age', 'sibsp', 'parch', 'fare']]
+y = df['survived']
+X =  pd.get_dummies(X, columns=['sex'])
+X.age.fillna(value= X['age'].mean(), inplace=True)
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+models = [LogisticRegression(), SVC(), DecisionTreeClassifier(), RandomForestClassifier(), KNeighborsClassifier()]
+model_names = ['LogisticRegression','SVM','DecisionTreeClassifier','RandomForestClassifier','KNN']
+
+model_scores = []
+for model,model_name in zip(models,model_names):
+    model.fit(X_train,y_train)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test,y_pred)
+    model_scores.append([model_names,accuracy])
+    
+sorted_models = sorted(model_scores, key=lambda X: X[1], reverse=True)
+for model in sorted_models:
+    print("Accuracy Score: ",f'{model[0]} : {model[1]: .2f}')
